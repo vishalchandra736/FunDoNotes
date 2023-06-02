@@ -10,12 +10,14 @@ const Stack = createStackNavigator();
 const AuthStack = () => {
   useEffect(() => {
     GoogleSignin.configure({
-      webClientId: '42936328642-n0vdggqg133e2mdslrtehlv0mac8uj27.apps.googleusercontent.com',
+      webClientId:
+        '42936328642-n0vdggqg133e2mdslrtehlv0mac8uj27.apps.googleusercontent.com',
+      offlineAccess: true,
     });
   }, []);
 
   return (
-    <Stack.Navigator>
+    <Stack.Navigator screenOptions={{headerShown: false}}>
       <Stack.Screen name="Login" component={Login} />
       <Stack.Screen name="Registration" component={Registration} />
       <Stack.Screen name="Password" component={Password} />

@@ -3,6 +3,7 @@ import {Text, View, TextInput, TouchableOpacity} from 'react-native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import styles from './Registration.style';
 import {AuthContext} from '../../navigation/AuthProvider';
+import GlobalStyles from '../../../src/styles/GlobalStyles';
 
 const Registration = ({navigation}) => {
   const [name, setName] = useState('');
@@ -12,9 +13,20 @@ const Registration = ({navigation}) => {
 
   const {registration} = useContext(AuthContext);
 
-  const onPressSingUp = () => {
-    registration(email, password);
-    //navigation.navigate('Home');
+  const handleSingUp = () => {
+    registration(email, password, getFirebaseError, name);
+  };
+
+  const getFirebaseError = code => {
+    const temp = {};
+    if (code === 'auth/email-already-in-use') {
+      temp['email'] = 'That email address is already in use!';
+      isValid = false;
+    }
+    if (code === 'auth/invalid-email') {
+      temp['email'] = 'That email address is invalid!';
+    }
+    setError(temp);
   };
 
   const validations = () => {
@@ -46,7 +58,7 @@ const Registration = ({navigation}) => {
 
   const onSubmit = () => {
     if (validations()) {
-      onPressSingUp();
+      handleSingUp();
     }
   };
 
@@ -69,7 +81,7 @@ const Registration = ({navigation}) => {
             value={name}
           />
         </View>
-        {error.name && <Text style={styles.error}>{error.name}</Text>}
+        {error.name && <Text style={GlobalStyles.error}>{error.name}</Text>}
         <View style={styles.textInnerView}>
           <MaterialIcons
             name="alternate-email"
@@ -83,7 +95,7 @@ const Registration = ({navigation}) => {
             value={email}
           />
         </View>
-        {error.email && <Text style={styles.error}>{error.email}</Text>}
+        {error.email && <Text style={GlobalStyles.error}>{error.email}</Text>}
         <View style={styles.textInnerView}>
           <MaterialIcons
             name="lock-outline"
@@ -98,10 +110,10 @@ const Registration = ({navigation}) => {
             secureTextEntry={true}
           />
         </View>
-        {error.password && <Text style={styles.error}>{error.password}</Text>}
+        {error.password && <Text style={GlobalStyles.error}>{error.password}</Text>}
       </View>
       <View style={styles.buttonView}>
-        <TouchableOpacity style={styles.button} onPress={onSubmit}>
+        <TouchableOpacity style={GlobalStyles.buttons} onPress={onSubmit}>
           <Text style={styles.buttonText}>Continue</Text>
         </TouchableOpacity>
       </View>

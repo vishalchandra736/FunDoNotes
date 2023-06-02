@@ -50,17 +50,17 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontWeight: 'bold',
   },
-  button: {
-    borderColor: '#F2F1EF',
-    borderWidth: 2,
-    margin: 30,
-    borderRadius: 20,
-    backgroundColor: '#22A7F0',
-  },
-  error: {
-    color: '#D24D57',
-    marginLeft: 40,
-  },
+  // button: {
+  //   borderColor: '#F2F1EF',
+  //   borderWidth: 2,
+  //   margin: 30,
+  //   borderRadius: 20,
+  //   backgroundColor: '#22A7F0',
+  // },
+  // error: {
+  //   color: '#D24D57',
+  //   marginLeft: 40,
+  // },
   newAccountButton: {
     margin: 20,
   },

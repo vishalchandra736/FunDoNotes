@@ -9,7 +9,7 @@ const Route = () => {
   const {user, setUser} = useContext(AuthContext);
   const [initializing, setInitializing] = useState(true);
 
-  const onAuthStateChanged = user => {
+  function onAuthStateChanged(user){
     setUser(user);
     if (initializing) setInitializing(false);
   };
@@ -29,3 +29,4 @@ const Route = () => {
 };
 
 export default Route;
+ 

@@ -2,18 +2,19 @@ import React, {useContext, useState} from 'react';
 import {Text, TextInput, View, TouchableOpacity} from 'react-native';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import styles from './Login.style';
-import { AuthContext } from '../../navigation/AuthProvider';
+import {AuthContext} from '../../navigation/AuthProvider';
+import GlobalStyles from '../../../src/styles/GlobalStyles'; 
 
 const Login = ({navigation}) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState({});
 
-  const {login} = useContext(AuthContext);
+  const {login, googleSignIn} = useContext(AuthContext);
 
   const onPressLogin = () => {
-    login(email, password);
-    // navigation.navigate('Home');
+    login(email, password, getFirebaseError);
+    // navigation.navigate('Notes');
   };
 
   const onPressRegister = () => {
@@ -22,6 +23,18 @@ const Login = ({navigation}) => {
 
   const onPressForgetPassword = () => {
     navigation.navigate('Password');
+  };
+
+  const getFirebaseError = code => {
+    const temp = {};
+    if (code === 'auth/user-not-found') {
+      temp['email'] = 'No user found!';
+      isValid = false;
+    }
+    if (code === 'auth/wrong-password') {
+      temp['password'] = 'The password is invalid!';
+    }
+    setError(temp);
   };
 
   const validations = () => {
@@ -59,7 +72,11 @@ const Login = ({navigation}) => {
       </View>
       <View style={styles.textView}>
         <View style={styles.textInnerView}>
-          <MaterialIcon name="alternate-email" size={30} style={styles.textIcon}/>
+          <MaterialIcon
+            name="alternate-email"
+            size={30}
+            style={styles.textIcon}
+          />
           <TextInput
             style={styles.textInput}
             placeholder="Email ID"
@@ -67,31 +84,33 @@ const Login = ({navigation}) => {
             value={email}
           />
         </View>
-        {error.email && <Text style={styles.error}>{error.email}</Text>}
+        {error.email && <Text style={GlobalStyles.error}>{error.email}</Text>}
         <View style={styles.textInnerView}>
           <MaterialIcon name="lock-outline" size={30} style={styles.textIcon} />
-        <TextInput
-          style={styles.textInput}
-          placeholder="Password"
-          onChangeText={text => setPassword(text)}
-          value={password}
-          secureTextEntry={true}
-        />
+          <TextInput
+            style={styles.textInput}
+            placeholder="Password"
+            onChangeText={text => setPassword(text)}
+            value={password}
+            secureTextEntry={true}
+          />
         </View>
-        {error.password && <Text style={styles.error}>{error.password}</Text>}
+        {error.password && <Text style={GlobalStyles.error}>{error.password}</Text>}
       </View>
       <View>
-      <TouchableOpacity
+        <TouchableOpacity
           style={styles.forgetPasswordButton}
           onPress={onPressForgetPassword}>
           <Text style={styles.forgetPasswordButtonText}>Forget Password?</Text>
         </TouchableOpacity>
       </View>
       <View style={styles.buttonView}>
-        <TouchableOpacity style={styles.button} onPress={onSubmit}>
+        <TouchableOpacity style={GlobalStyles.buttons} onPress={onSubmit}>
           <Text style={styles.buttonText}>Login</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.googleButton}>
+        <TouchableOpacity
+          style={styles.googleButton}
+          onPress={()=>{googleSignIn()}}>
           <Text style={styles.googleButtonText}>Sign in with Google</Text>
         </TouchableOpacity>
         <TouchableOpacity

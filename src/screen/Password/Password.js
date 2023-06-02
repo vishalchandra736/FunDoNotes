@@ -1,14 +1,31 @@
 import {View, Text, TextInput, TouchableOpacity} from 'react-native';
-import React, {useState} from 'react';
+import React, {useContext, useState} from 'react';
 import styles from './Password.style';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import GlobalStyles from '../../../src/styles/GlobalStyles';
+import {AuthContext} from '../../navigation/AuthProvider';
 
 const Password = ({navigation}) => {
   const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  //const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState({});
 
+  const {resetPassword} = useContext(AuthContext);
+
+  const getFirebaseError = code => {
+    const temp = {};
+    if (code === 'auth/user-not-found') {
+      temp['email'] = 'No user found!';
+      isValid = false;
+    }
+    if (code === 'auth/wrong-password') {
+      temp['password'] = 'The password is invalid!';
+    }
+    setError(temp);
+  };
+
   const onPressSubmit = () => {
+    resetPassword(password, getFirebaseError);
     navigation.navigate('Login');
   };
 
@@ -16,18 +33,17 @@ const Password = ({navigation}) => {
     let isValid = true;
     let tempErrors = {};
 
-    const passwordRegex =
-      /^((?=\S*?[A-Z])(?=\S*?[a-z])(?=\S*?[0-9])(?=.*[@#$%&*+_-]).{6,})\S$/;
+    const emailRegex = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
 
-    if (!passwordRegex.test(password)) {
+    if (!emailRegex.test(password)) {
       isValid = false;
       tempErrors['password'] = 'Please, enter a valid password';
     }
 
-    if (confirmPassword !== password) {
-      isValid = false;
-      tempErrors['confirmPassword'] = 'Your password is incorrect';
-    }
+    //   if (confirmPassword !== password) {
+    //     isValid = false;
+    //     tempErrors['confirmPassword'] = 'Your password is incorrect';
+    //   }
 
     setError(tempErrors);
     return isValid;
@@ -50,20 +66,21 @@ const Password = ({navigation}) => {
       <View style={styles.textView}>
         <View style={styles.textInnerView}>
           <MaterialIcons
-            name="lock-outline"
+            name="alternate-email"
             size={30}
             style={styles.textIcon}
           />
           <TextInput
             style={styles.textInput}
-            placeholder="New Password"
+            placeholder="Email"
             onChangeText={text => setPassword(text)}
             value={password}
-            secureTextEntry={true}
           />
         </View>
-        {error.password && <Text style={styles.error}>{error.password}</Text>}
-        <View style={styles.textInnerView}>
+        {error.password && (
+          <Text style={GlobalStyles.error}>{error.password}</Text>
+        )}
+        {/* <View style={styles.textInnerView}>
           <MaterialIcons
             name="lock-outline"
             size={30}
@@ -77,10 +94,10 @@ const Password = ({navigation}) => {
             secureTextEntry={true}
           />
         </View>
-        {error.confirmPassword && <Text style={styles.error}>{error.confirmPassword}</Text>}
+        {error.confirmPassword && <Text style={styles.error}>{error.confirmPassword}</Text>} */}
       </View>
       <View>
-        <TouchableOpacity style={styles.button} onPress={onSubmit}>
+        <TouchableOpacity style={GlobalStyles.buttons} onPress={onSubmit}>
           <Text style={styles.buttonText}>Submit</Text>
         </TouchableOpacity>
       </View>

@@ -1,5 +1,11 @@
 import React, {createContext, useState} from 'react';
+import {Alert} from 'react-native';
 import auth from '@react-native-firebase/auth';
+import {
+  GoogleSignin,
+  statusCodes,
+} from '@react-native-google-signin/google-signin';
+import {addUserData} from '../services/UserServices';
 
 export const AuthContext = createContext();
 
@@ -11,44 +17,69 @@ export const AuthProvider = ({children}) => {
       value={{
         user,
         setUser,
-        login: async (email, password) => {
+        login: async (email, password, errorCallback) => {
           try {
             await auth().signInWithEmailAndPassword(email, password);
           } catch (error) {
-            if (error.code === 'auth/email-already-in-use') {
-              console.log('That email address is already in use!');
-            }
-            if (error.code === 'auth/invalid-email') {
-              console.log('That email address is invalid!');
-            }
-            if (error.code === 'auth/user-not-found') {
-              console.log('That email address not found!');
-            }
+            errorCallback(error.code);
             console.error(error);
+            console.log(error.code, 'Code error');
           }
         },
-        registration: async (email, password) => {
+        registration: async (email, password, errorCallback, name) => {
           try {
-            await auth()
-              .createUserWithEmailAndPassword(email, password);
-              // .signInWithEmailAndPassword(email, password);
+            const uDetails = await auth().createUserWithEmailAndPassword(
+              email,
+              password,
+            );
+            addUserData(email, name, uDetails.user.uid);
             console.log('User account created & signed in!');
           } catch (error) {
-            if (error.code === 'auth/email-already-in-use') {
-              console.log('That email address is already in use!');
-            }
-            if (error.code === 'auth/invalid-email') {
-              console.log('That email address is invalid!');
-            }
+            errorCallback(error.code);
             console.error(error);
+            console.log(error.code, 'Code error');
           }
         },
-        logout: async (email, password) => {
+        resetPassword: async (email, errorCallback) => {
           try {
-            await auth().signOut();
-            console.log('User signed out!');
+            await auth().sendPasswordResetEmail(email);
+            Alert.alert('Reset link send to your email!');
+            console.log('Reset link send to your email!');
+          } catch (error) {
+            errorCallback(error.code);
+            console.error(error);
+            console.log(error.code, 'Code error');
+          }
+        },
+        logout: async () => {
+          try {
+            !user.idToken
+              ? await auth().signOut()
+              : await GoogleSignin.signOut();
+            setUser(null);
           } catch (error) {
             console.log(error);
+          }
+        },
+        googleSignIn: async () => {
+          try {
+            console.log('in method');
+            await GoogleSignin.hasPlayServices();
+            const userInfo = await GoogleSignin.signIn();
+            console.log(userInfo);
+            console.log('done');
+            setUser(userInfo);
+          } catch (error) {
+            console.log(error);
+            if (error.code === statusCodes.SIGN_IN_CANCELLED) {
+              // user cancelled the login flow
+            } else if (error.code === statusCodes.IN_PROGRESS) {
+              // operation (e.g. sign in) is in progress already
+            } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
+              // play services not available or outdated
+            } else {
+              // some other error happened
+            }
           }
         },
       }}>
