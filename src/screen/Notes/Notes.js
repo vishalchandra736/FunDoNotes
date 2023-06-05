@@ -12,8 +12,10 @@ import InnerModal from '../../components/InnerModal';
 import ImagePicker from 'react-native-image-crop-picker';
 import storage from '@react-native-firebase/storage';
 import NoteCard from '../../components/NoteCard';
+import {changeLayout} from '../../redux/Action';
+import {useDispatch, useSelector} from 'react-redux';
 
-const Notes = ({navigation}) => {
+const Notes = ({navigation, layout}) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [innerModal, setInnerModal] = useState(false);
   const [image, setImage] = useState('');
@@ -21,7 +23,8 @@ const Notes = ({navigation}) => {
   const [fullName, setFullName] = useState('');
   const [otherNotes, setOtherNotes] = useState();
   const [pinnedNotes, setPinnedNotes] = useState();
-  const [layout, setLayout] = useState(true);
+  const dispatch = useDispatch();
+  layout = useSelector(state => state.layout);
 
   const uploadedCloud = async img => {
     try {
@@ -99,13 +102,17 @@ const Notes = ({navigation}) => {
     }
   };
 
+  const handleChangeLayout = () => {
+    dispatch(changeLayout());
+  };
+
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
       fetchData();
       fetchNoteData();
     });
     return unsubscribe;
-  }, [fetchData, fetchNoteData, navigation, uploadedCloud]);
+  }, [fetchData, fetchNoteData, navigation, uploadedCloud, user]);
 
   const PinnedFlatList = () => {
     return (
@@ -186,7 +193,7 @@ const Notes = ({navigation}) => {
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.headerButton}
-            onPress={() => setLayout(!layout)}>
+            onPress={handleChangeLayout}>
             <MaterialCommunity
               name={layout ? 'view-grid-outline' : 'view-list-outline'}
               size={30}

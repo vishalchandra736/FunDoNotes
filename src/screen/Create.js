@@ -11,16 +11,20 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import {AuthContext} from '../navigation/AuthProvider';
 import {addLabelData, fetchLabelData} from '../services/LabelServices';
 import LabelCard from '../components/LabelCard';
+import { useDispatch, useSelector } from 'react-redux';
+import { labelsData } from '../redux/Action';
 
 const Create = ({navigation}) => {
   const [label, setLabel] = useState();
   const [icon, setIcon] = useState(false);
   const {user} = useContext(AuthContext);
-  const [labelData, setLabelData] = useState();
+  //const [labelData, setLabelData] = useState();
+  const dispatch = useDispatch();
+  const labelData = useSelector(state => state.labels)
 
   const fetchLabel = async () => {
-    const labelData = await fetchLabelData(user.uid);
-    setLabelData(labelData);
+    const data = await fetchLabelData(user.uid);
+    dispatch(labelsData(data))
   };
 
   useEffect(() => {

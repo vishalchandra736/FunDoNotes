@@ -5,11 +5,14 @@ import NoteCard from '../components/NoteCard';
 import {AuthContext} from '../navigation/AuthProvider';
 import styles from '../styles/GlobalStyles';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import {useDispatch, useSelector} from 'react-redux';
+import {changeLayout} from '../redux/Action';
 
 const Archive = ({navigation}) => {
   const {user} = useContext(AuthContext);
   const [archivedNotes, setArchivedNotes] = useState();
-  const [layout, setLayout] = useState(false);
+  const dispatch = useDispatch();
+  const layout = useSelector(state => state.layout);
 
   const fetchArchiveNoteData = async () => {
     try {
@@ -25,6 +28,10 @@ const Archive = ({navigation}) => {
     } catch (error) {
       console.log(error);
     }
+  };
+
+  const handleChangeLayout = () => {
+    dispatch(changeLayout());
   };
 
   useEffect(() => {
@@ -48,10 +55,13 @@ const Archive = ({navigation}) => {
             style={{margin: '2%'}}
           />
         </TouchableOpacity>
-        <Text style={{fontSize: 20, margin: '2%', padding: '2%', width: 300}}>Archive</Text>
-        <TouchableOpacity onPress={() => setLayout(!layout)}>
+        <Text style={{fontSize: 20, margin: '2%', padding: '2%', width: 300}}>
+          Archive
+        </Text>
+        <TouchableOpacity
+          onPress={handleChangeLayout}>
           <MaterialCommunityIcons
-            name={layout ? 'view-list-outline' : 'view-grid-outline'}
+            name={layout ? 'view-grid-outline' : 'view-list-outline'}
             size={30}
             style={{margin: '2%'}}
           />
@@ -59,7 +69,8 @@ const Archive = ({navigation}) => {
       </View>
 
       <FlatList
-      numColumns={layout ? 1 : 2}
+        key={layout ? 1 : 2}
+        numColumns={layout ? 1 : 2}
         data={archivedNotes}
         renderItem={({item}) => (
           <TouchableOpacity

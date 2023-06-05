@@ -1,10 +1,34 @@
-import React from 'react';
-import {Text, View, StyleSheet, TouchableOpacity} from 'react-native';
+import React, {useState, useContext, useEffect} from 'react';
+import {Text, View, StyleSheet, TouchableOpacity, FlatList} from 'react-native';
 import {DrawerContentScrollView} from '@react-navigation/drawer';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-
+import {fetchLabelData} from '../services/LabelServices';
+import {AuthContext} from './AuthProvider';
+import {useDispatch, useSelector} from 'react-redux';
+import {labelsData} from '../redux/Action';
 
 const CustomDrawer = ({props, navigation}) => {
+  //const [fetchLabel, setFetchLabel] = useState();
+  const {user} = useContext(AuthContext);
+  const dispatch = useDispatch();
+  const labelData = useSelector(state => state.labels);
+
+  const fetchLabelDataFunction = async () => {
+    try {
+      const labels = await fetchLabelData(user.uid);
+      dispatch(labelsData(labels));
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      fetchLabelDataFunction();
+    });
+    return unsubscribe;
+  }, [fetchLabelDataFunction, navigation]);
+
   return (
     <View style={styles.drawer}>
       <DrawerContentScrollView {...props}>
@@ -28,14 +52,66 @@ const CustomDrawer = ({props, navigation}) => {
           </TouchableOpacity>
         </View>
         <View>
-          <View>
-            <TouchableOpacity
-              style={styles.home}
-              onPress={() => navigation.navigate('Create new label')}>
-              <MaterialCommunityIcons name="plus" size={35} />
-              <Text style={styles.text}>Create new label</Text>
-            </TouchableOpacity>
-          </View>
+          {labelData?.length > 0 ? (
+            <View
+              style={{
+                borderBottomWidth: 1.5,
+                borderTopWidth: 1.5,
+                paddingVertical: 5,
+                borderColor: '#918f3f',
+                marginVertical: 10,
+              }}>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  justifyContent: 'space-between',
+                  marginHorizontal: 20,
+                  marginVertical: 10,
+                }}>
+                <Text>Label</Text>
+                <TouchableOpacity
+                  onPress={() => navigation.navigate('Create new label')}>
+                  <Text>Edit</Text>
+                </TouchableOpacity>
+              </View>
+
+              {labelData?.map(item => (
+                <TouchableOpacity>
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      marginHorizontal: 10,
+                      marginVertical: 10,
+                      alignItems: 'center',
+                    }}>
+                    <MaterialCommunityIcons
+                      name="label-outline"
+                      size={20}
+                      style={{marginHorizontal: 10}}
+                    />
+                    <Text style={{fontSize: 16}}>{item.label}</Text>
+                  </View>
+                </TouchableOpacity>
+              ))}
+              <View>
+                <TouchableOpacity
+                  style={styles.home}
+                  onPress={() => navigation.navigate('Create new label')}>
+                  <MaterialCommunityIcons name="plus" size={35} />
+                  <Text style={styles.text}>Create new label</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          ) : (
+            <View>
+              <TouchableOpacity
+                style={styles.home}
+                onPress={() => navigation.navigate('Create new label')}>
+                <MaterialCommunityIcons name="plus" size={35} />
+                <Text style={styles.text}>Create new label</Text>
+              </TouchableOpacity>
+            </View>
+          )}
         </View>
         <View>
           <TouchableOpacity
