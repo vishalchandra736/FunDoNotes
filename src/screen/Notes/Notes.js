@@ -88,9 +88,9 @@ const Notes = ({navigation, layout}) => {
       const pin = [];
       const other = [];
       noteData.forEach(note => {
-        if (note.pinned && !note.archive) {
+        if (note.pinned && !note.archive && !note.deleted) {
           pin.push(note);
-        } else if (!note.pinned && !note.archive) {
+        } else if (!note.pinned && !note.archive  && !note.deleted) {
           other.push(note);
         }
       });
@@ -112,7 +112,7 @@ const Notes = ({navigation, layout}) => {
       fetchNoteData();
     });
     return unsubscribe;
-  }, [fetchData, fetchNoteData, navigation, uploadedCloud, user]);
+  }, [fetchData, fetchNoteData, navigation, uploadedCloud]);
 
   const PinnedFlatList = () => {
     return (
@@ -133,7 +133,9 @@ const Notes = ({navigation, layout}) => {
                   notes: item.notes,
                   pinned: item.pinned,
                   archive: item.archive,
+                  deleted: item.deleted,
                   noteId: item.id,
+                  labelData: item.labelData,
                 })
               }>
               <View>
@@ -162,9 +164,12 @@ const Notes = ({navigation, layout}) => {
                   notes: item.notes,
                   pinned: item.pinned,
                   archive: item.archive,
+                  deleted : item.deleted,
                   noteId: item.id,
+                  labelData: item.labelData,
                 })
               }>
+                {console.log("Item" ,item)}
               <View>
                 <NoteCard item={item} />
               </View>

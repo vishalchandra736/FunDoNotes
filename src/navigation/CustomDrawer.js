@@ -89,7 +89,7 @@ const CustomDrawer = ({props, navigation}) => {
                       size={20}
                       style={{marginHorizontal: 10}}
                     />
-                    <Text style={{fontSize: 16}}>{item.label}</Text>
+                    <Text style={{fontSize: 16}} numberOfLines={1}>{item.label}</Text>
                   </View>
                 </TouchableOpacity>
               ))}
@@ -122,6 +122,30 @@ const CustomDrawer = ({props, navigation}) => {
               size={35}
             />
             <Text style={styles.text}>Archive</Text>
+          </TouchableOpacity>
+        </View>
+        <View>
+          <TouchableOpacity
+            style={styles.home}
+            onPress={() => navigation.navigate('Deleted')}>
+            <MaterialCommunityIcons name="trash-can-outline" size={35} />
+            <Text style={styles.text}>Deleted</Text>
+          </TouchableOpacity>
+        </View>
+        <View>
+          <TouchableOpacity
+            style={styles.home}
+            onPress={() => navigation.navigate('Archive')}>
+            <MaterialCommunityIcons name="cog-outline" size={35} />
+            <Text style={styles.text}>Settings</Text>
+          </TouchableOpacity>
+        </View>
+        <View>
+          <TouchableOpacity
+            style={styles.home}
+            onPress={() => navigation.navigate('Archive')}>
+            <MaterialCommunityIcons name="help-circle-outline" size={35} />
+            <Text style={styles.text}>Help & feedback</Text>
           </TouchableOpacity>
         </View>
       </DrawerContentScrollView>

@@ -51,8 +51,8 @@ const LabelCard = props => {
         flexDirection: 'row',
         alignItems: 'center',
         margin: '2%',
-        borderTopWidth: 1,
-        borderBottomWidth: 1,
+        borderTopWidth: 0.2,
+        borderBottomWidth: 0.2,
         borderColor: '#918f3f',
       }}>
       <TouchableOpacity onPress={handelOnDeleteLabel}>
@@ -85,7 +85,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     margin: '2%',
     padding: '2%',
-    width: 320,
+    width: 300,
   },
 });
 

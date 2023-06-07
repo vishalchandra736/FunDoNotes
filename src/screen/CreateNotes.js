@@ -4,12 +4,16 @@ import {
   StyleSheet,
   TouchableOpacity,
   TextInput,
+  ScrollView,
 } from 'react-native';
 import React, {useState, useContext} from 'react';
 import MaterialCommunity from 'react-native-vector-icons/MaterialCommunityIcons';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {addNotesData, updateNotesData} from '../services/NotesServices';
 import {AuthContext} from '../navigation/AuthProvider';
+import BottomSheet from '../components/BottomSheet';
+import uuid from 'react-native-uuid';
+import Chip from '../components/Chip';
 
 const CreateNotes = ({navigation, route}) => {
   const noteData = route.params;
@@ -18,20 +22,54 @@ const CreateNotes = ({navigation, route}) => {
   const {user} = useContext(AuthContext);
   const [pinned, setPinned] = useState(noteData ? noteData?.pinned : false);
   const [archive, setArchive] = useState(noteData ? noteData?.archive : false);
-
+  const [deleted, setDeleted] = useState(noteData ? noteData?.deleted : false);
+  const [bottomSheet, setBottomSheet] = useState(false);
+  const selfNoteID = uuid.v4();
+  const labelData = route.params.checkedLabelsData || noteData?.labelData || [];
   const handleAddData = async () => {
     try {
-      await addNotesData(user.uid, title, notes, pinned, archive);
+      await addNotesData(
+        user.uid,
+        selfNoteID,
+        title,
+        notes,
+        pinned,
+        archive,
+        deleted,
+        labelData,
+      );
     } catch (err) {
       console.error(err);
     }
   };
 
-  const handleUpdateData = () => {
+  const handleUpdateData = async () => {
     try {
-      updateNotesData(user.uid, noteData.noteId, title, notes, pinned, archive);
+      await updateNotesData(
+        user.uid,
+        noteData.noteId,
+        title,
+        notes,
+        pinned,
+        archive,
+        deleted,
+        labelData,
+      );
+      console.log(deleted);
     } catch (err) {
       console.log(err);
+    }
+  };
+
+  const handelBackPress = () => {
+    if ((title || notes) === '') {
+      navigation.goBack();
+    } else {
+      if (noteData?.noteId) {
+        handleUpdateData(), navigation.goBack();
+      } else {
+        handleAddData(), navigation.goBack();
+      }
     }
   };
 
@@ -39,18 +77,7 @@ const CreateNotes = ({navigation, route}) => {
     <View style={styles.body}>
       <View style={styles.headerIcon}>
         <View style={styles.headerIcon}>
-          <TouchableOpacity
-            onPress={() => {
-              if ((title || notes) === '') {
-                navigation.goBack();
-              } else {
-                if (noteData.noteId) {
-                  handleUpdateData(), navigation.goBack();
-                } else {
-                  handleAddData(), navigation.goBack();
-                }
-              }
-            }}>
+          <TouchableOpacity onPress={handelBackPress}>
             <MaterialCommunity name="arrow-left" style={styles.icon} />
           </TouchableOpacity>
         </View>
@@ -90,6 +117,15 @@ const CreateNotes = ({navigation, route}) => {
           value={notes}
           onChangeText={value => setNotes(value)}
         />
+        <ScrollView >
+          <View style={{flexWrap: 'wrap', flexDirection: 'row'}}>
+            {labelData.map(item => (
+              <View>
+                <Chip key={item.id}>{item.label}</Chip>
+              </View>
+            ))}
+          </View>
+        </ScrollView>
       </View>
       <View style={styles.footer}>
         <View style={styles.headerIcon}>
@@ -105,11 +141,25 @@ const CreateNotes = ({navigation, route}) => {
             <Text style={styles.edited}>Edited</Text>
           </View>
           <View style={styles.headerIcon}>
-            <TouchableOpacity>
+            <TouchableOpacity onPress={() => setBottomSheet(!bottomSheet)}>
               <MaterialCommunity name="dots-vertical" style={styles.icon} />
             </TouchableOpacity>
           </View>
         </View>
+      </View>
+      <View>
+        <BottomSheet
+          visible={bottomSheet}
+          onRequestClose={() => setBottomSheet(false)}
+          hideModal={() => setBottomSheet(false)}
+          onPressDelete={() => setDeleted(!deleted)}
+          onPressLabel={() =>
+            navigation.navigate('Labels', {
+              noteId: noteData.noteId,
+              labelData: labelData,
+            })
+          }
+        />
       </View>
     </View>
   );

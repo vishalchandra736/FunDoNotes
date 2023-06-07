@@ -5,6 +5,8 @@ import Create from '../screen/Create';
 import Archive from '../screen/Archive';
 import Notes from '../screen/Notes/Notes';
 import CustomDrawer from './CustomDrawer';
+import DeletesNotes from '../screen/DeletesNotes';
+
 const Drawer = createDrawerNavigator();
 
 const MyDrawer = () => {
@@ -19,6 +21,7 @@ const MyDrawer = () => {
       <Drawer.Screen name="Reminder" component={Reminder} />
       <Drawer.Screen name="Create new label" component={Create} />
       <Drawer.Screen name="Archive" component={Archive} />
+      <Drawer.Screen name="Deleted" component={DeletesNotes} />
     </Drawer.Navigator>
   );
 };

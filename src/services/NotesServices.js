@@ -1,15 +1,27 @@
 import firestore from '@react-native-firebase/firestore';
 
-export const addNotesData = async (uid, title, notes, pinned, archive) => {
+export const addNotesData = async (
+  uid,
+  noteID,
+  title,
+  notes,
+  pinned,
+  archive,
+  deleted,
+  labelData,
+) => {
   await firestore()
     .collection('Users')
     .doc(uid)
     .collection('Notes')
-    .add({
+    .doc(noteID)
+    .set({
       title: title,
       notes: notes,
       pinned: pinned,
       archive: archive,
+      deleted: deleted,
+      labelData: labelData
     });
 };
 
@@ -22,7 +34,7 @@ export const fetchNotesData = async user => {
     .get()
     .then(querySnapshot => {
       querySnapshot.forEach(documentSnapshot => {
-        let data= documentSnapshot.data();
+        let data = documentSnapshot.data();
         data.id = documentSnapshot.id;
         notesDetails.push(data);
       });
@@ -37,6 +49,8 @@ export const updateNotesData = async (
   notes,
   pinned,
   archive,
+  deleted,
+  labelData,
 ) => {
   await firestore()
     .collection('Users')
@@ -48,5 +62,21 @@ export const updateNotesData = async (
       notes: notes,
       pinned: pinned,
       archive: archive,
+      deleted: deleted,
+      labelData: labelData,
     });
+};
+
+export const deleteNoteData = async (uid, noteId) => {
+  try {
+    await firesotre()
+      .collection('Users')
+      .doc(uid)
+      .collection('Notes')
+      .doc(noteId)
+      .delete()
+      .then(console.log('deleleted'));
+  } catch (error) {
+    console.log(error);
+  }
 };
